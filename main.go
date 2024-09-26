@@ -49,6 +49,7 @@ func main(){
 	userController := controllers.NewUserController(db)
 	usersGroup.POST("/", 	userController.CreateUser)
 	usersGroup.GET("/:id", 	userController.FindUser)
+	usersGroup.GET("/all", 	userController.FetchUsers)
 
 	e.Logger.Fatal(e.Start(":3001"))
 }

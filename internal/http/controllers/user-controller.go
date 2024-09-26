@@ -51,7 +51,17 @@ func (u *UserController) FindUser(c echo.Context) error {
 		return c.String(http.StatusBadRequest, "missing id")
 	}
 
-	u.Db.Where("id = ?", id).Find(&users)
+	u.Db.Where("id = ?", id).First(&users)
 
 	return c.JSON(http.StatusOK, users)
 }
+
+func (u *UserController) FetchUsers(c echo.Context) error {
+	var users []dto.User
+
+	u.Db.Find(&users)
+
+	c.JSON(http.StatusOK, users)
+
+	return nil
+} 
