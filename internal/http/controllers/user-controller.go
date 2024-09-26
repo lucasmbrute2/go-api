@@ -19,7 +19,7 @@ func NewUserController(db *gorm.DB) *UserController {
 	}
 }
 
-func (u *UserController) Handle(c echo.Context) error {
+func (u *UserController) CreateUser(c echo.Context) error {
 	var user dto.User
 
 	err := c.Bind(&user); if err != nil {
@@ -35,8 +35,23 @@ func (u *UserController) Handle(c echo.Context) error {
 	userDomain := entity.UserEntity{
 		ID: user.ID,
 		Email: user.Email,
+		Age: user.Age,
 		IsAdmin: false,
 	}
 
 	return c.JSON(http.StatusCreated, userDomain)
+}
+
+func (u *UserController) FindUser(c echo.Context) error {
+	var users dto.User
+
+	id := c.Param("id")
+
+	if id == "" {
+		return c.String(http.StatusBadRequest, "missing id")
+	}
+
+	u.Db.Where("id = ?", id).Find(&users)
+
+	return c.JSON(http.StatusOK, users)
 }

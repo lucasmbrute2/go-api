@@ -5,8 +5,8 @@ import (
 
 	"github.com/go-playground/validator"
 	"github.com/labstack/echo/v4"
+	"github.com/lucasmbrute2/go-api/internal/http/controllers"
 	"github.com/lucasmbrute2/go-api/internal/modules/user/entity"
-	"github.com/lucasmbrute2/go-api/package/http/controllers"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
@@ -47,7 +47,8 @@ func main(){
 	usersGroup := e.Group("/users")
 
 	userController := controllers.NewUserController(db)
-	usersGroup.POST("/", 	userController.Handle)
+	usersGroup.POST("/", 	userController.CreateUser)
+	usersGroup.GET("/:id", 	userController.FindUser)
 
 	e.Logger.Fatal(e.Start(":3001"))
 }
