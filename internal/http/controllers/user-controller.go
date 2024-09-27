@@ -1,10 +1,12 @@
 package controllers
 
 import (
+	"errors"
 	"net/http"
+	"strconv"
 
 	"github.com/labstack/echo/v4"
-	"github.com/lucasmbrute2/go-api/internal/modules/user/dto"
+	"github.com/lucasmbrute2/go-api/internal/http/view"
 	"github.com/lucasmbrute2/go-api/internal/modules/user/entity"
 	"gorm.io/gorm"
 )
@@ -20,7 +22,7 @@ func NewUserController(db *gorm.DB) *UserController {
 }
 
 func (u *UserController) CreateUser(c echo.Context) error {
-	var user dto.User
+	var user entity.User
 
 	err := c.Bind(&user); if err != nil {
 		return c.String(http.StatusBadRequest, "bad request")
@@ -32,18 +34,12 @@ func (u *UserController) CreateUser(c echo.Context) error {
 	
 	u.Db.Create(&user)
 	
-	userDomain := entity.UserEntity{
-		ID: user.ID,
-		Email: user.Email,
-		Age: user.Age,
-		IsAdmin: false,
-	}
-
-	return c.JSON(http.StatusCreated, userDomain)
+	userView := view.NewUserView()
+	return c.JSON(http.StatusCreated, userView.ToHTTP(user))
 }
 
 func (u *UserController) FindUser(c echo.Context) error {
-	var users dto.User
+	var user entity.User
 
 	id := c.Param("id")
 
@@ -51,17 +47,69 @@ func (u *UserController) FindUser(c echo.Context) error {
 		return c.String(http.StatusBadRequest, "missing id")
 	}
 
-	u.Db.Where("id = ?", id).First(&users)
+	u.Db.Where("id = ?", id).First(&user)
 
-	return c.JSON(http.StatusOK, users)
+	userView := view.NewUserView()
+
+	return c.JSON(http.StatusOK, userView.ToHTTP(user))
 }
 
 func (u *UserController) FetchUsers(c echo.Context) error {
-	var users []dto.User
+	var users []entity.User
 
 	u.Db.Find(&users)
 
-	c.JSON(http.StatusOK, users)
+	var usersDomain []view.UserView
+	userView := view.NewUserView()
+
+	for _, v := range users {
+		usersDomain = append(usersDomain, userView.ToHTTP(v))
+	}
+	
+	c.JSON(http.StatusOK, usersDomain)
 
 	return nil
 } 
+
+
+func (u *UserController) UpdateUsers(c echo.Context) error {
+	var payload entity.UpdateUser
+
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		return c.String(http.StatusBadRequest, "missing id")
+	}
+
+	if err := c.Bind(&payload); err != nil {
+		return c.String(http.StatusBadRequest, err.Error())
+	}
+	
+	payload.ID = id
+	var user entity.User
+	result := u.Db.First(&user)
+
+	if err := errors.Is(result.Error, gorm.ErrRecordNotFound); err {
+		return c.String(http.StatusBadRequest, "user not found")
+	}
+
+	if err = c.Validate(payload); err != nil {
+		return err
+	}
+
+	if payload.Age != 0 {
+		user.Age = payload.Age
+	}
+
+	if payload.Name != "" {
+		user.Name = payload.Name
+	}
+
+	if payload.Email != "" {
+		user.Email = payload.Email
+	}
+
+	u.Db.Save(&user)
+
+	userView := view.NewUserView()
+	return c.JSON(http.StatusOK, userView.ToHTTP(user))
+}

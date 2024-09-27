@@ -34,7 +34,7 @@ func main(){
 		panic(err)
 	}
 
-	err = db.AutoMigrate(&entity.UserEntity{})
+	err = db.AutoMigrate(&entity.User{})
 	if err != nil{
 		panic(err)
 	}
@@ -50,6 +50,7 @@ func main(){
 	usersGroup.POST("/", 	userController.CreateUser)
 	usersGroup.GET("/:id", 	userController.FindUser)
 	usersGroup.GET("/all", 	userController.FetchUsers)
+	usersGroup.PUT("/:id", 	userController.UpdateUsers)
 
 	e.Logger.Fatal(e.Start(":3001"))
 }
