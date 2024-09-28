@@ -52,5 +52,5 @@ func main(){
 	usersGroup.GET("/all", 	userController.FetchUsers)
 	usersGroup.PUT("/:id", 	userController.UpdateUsers)
 
-	e.Logger.Fatal(e.Start(":3001"))
+	e.Logger.Fatal(e.Start(":3002"))
 }

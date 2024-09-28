@@ -7,6 +7,7 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/lucasmbrute2/go-api/internal/http/view"
+	"github.com/lucasmbrute2/go-api/internal/infra/cipher"
 	"github.com/lucasmbrute2/go-api/internal/modules/user/dto"
 	"gorm.io/gorm"
 )
@@ -32,6 +33,16 @@ func (u *UserController) CreateUser(c echo.Context) error {
 		return err
 	}
 	
+	salts := 6
+	cipher := cipher.NewCipher(salts)
+	cipherPassword, err :=  cipher.Encrypt(user.Password)
+
+	if err != nil {
+		return c.String(http.StatusInternalServerError, "Internal server error")
+	}
+
+	user.Password = cipherPassword
+
 	u.Db.Create(&user)
 	
 	userView := view.NewUserView()
