@@ -5,10 +5,15 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/lucasmbrute2/go-api/internal/infra/cipher"
+	"github.com/lucasmbrute2/go-api/internal/infra/jwt"
 	"github.com/lucasmbrute2/go-api/internal/modules/auth/dto"
 	userDto "github.com/lucasmbrute2/go-api/internal/modules/user/dto"
 	"gorm.io/gorm"
 )
+
+type Login struct {
+	Token string `json:"accessToken"`
+}
 
 var BadRequestError = "bad request error"
 var InvalidCredentialsError = "invalid credentials"
@@ -48,6 +53,16 @@ func (a *AuthController) Login(c echo.Context) error {
 		return c.String(http.StatusBadRequest, InvalidCredentialsError)
 	}
 
-	return nil
+	s := jwt.JWT{
+		Secret: "secret",
+	}
 
+	token, err := s.Generate(user.ID)
+	if err != nil {
+		return c.String(http.StatusInternalServerError, "internal server error")
+	}
+
+	return c.JSON(http.StatusOK, Login{
+		Token: token,
+	})
 }
