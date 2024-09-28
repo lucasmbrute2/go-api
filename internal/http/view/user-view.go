@@ -1,6 +1,6 @@
 package view
 
-import "github.com/lucasmbrute2/go-api/internal/modules/user/entity"
+import "github.com/lucasmbrute2/go-api/internal/modules/user/dto"
 
 type UserView struct {
 	ID int `json:"id"`
@@ -14,21 +14,12 @@ func NewUserView() *UserView{
 	return &UserView{}
 }
 
-func (u *UserView) ToHTTP(user entity.User) UserView {
+func (u *UserView) ToHTTP(user dto.User) UserView {
 	return UserView{
 		ID: user.ID,
 		Name: user.Name,
 		Email: user.Email,
 		Age: user.Age,
 		IsAdmin: user.IsAdmin,
-	}
-}
-
-func (u *UserView) UpdateToHTTP(user entity.UpdateUser) UserView {
-	return UserView{
-		ID: user.ID,
-		Name: user.Name,
-		Email: user.Email,
-		Age: user.Age,
 	}
 }

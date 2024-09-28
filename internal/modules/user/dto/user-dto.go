@@ -1,4 +1,4 @@
-package entity
+package dto
 
 type User struct {
 	ID int `json:"id" gorm:"primaryKey"`

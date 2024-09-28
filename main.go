@@ -6,7 +6,7 @@ import (
 	"github.com/go-playground/validator"
 	"github.com/labstack/echo/v4"
 	"github.com/lucasmbrute2/go-api/internal/http/controllers"
-	"github.com/lucasmbrute2/go-api/internal/modules/user/entity"
+	"github.com/lucasmbrute2/go-api/internal/modules/user/dto"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
@@ -34,7 +34,7 @@ func main(){
 		panic(err)
 	}
 
-	err = db.AutoMigrate(&entity.User{})
+	err = db.AutoMigrate(&dto.User{})
 	if err != nil{
 		panic(err)
 	}

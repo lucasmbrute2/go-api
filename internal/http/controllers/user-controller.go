@@ -7,7 +7,7 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/lucasmbrute2/go-api/internal/http/view"
-	"github.com/lucasmbrute2/go-api/internal/modules/user/entity"
+	"github.com/lucasmbrute2/go-api/internal/modules/user/dto"
 	"gorm.io/gorm"
 )
 
@@ -22,7 +22,7 @@ func NewUserController(db *gorm.DB) *UserController {
 }
 
 func (u *UserController) CreateUser(c echo.Context) error {
-	var user entity.User
+	var user dto.User
 
 	err := c.Bind(&user); if err != nil {
 		return c.String(http.StatusBadRequest, "bad request")
@@ -39,7 +39,7 @@ func (u *UserController) CreateUser(c echo.Context) error {
 }
 
 func (u *UserController) FindUser(c echo.Context) error {
-	var user entity.User
+	var user dto.User
 
 	id := c.Param("id")
 
@@ -55,7 +55,7 @@ func (u *UserController) FindUser(c echo.Context) error {
 }
 
 func (u *UserController) FetchUsers(c echo.Context) error {
-	var users []entity.User
+	var users []dto.User
 
 	u.Db.Find(&users)
 
@@ -73,7 +73,7 @@ func (u *UserController) FetchUsers(c echo.Context) error {
 
 
 func (u *UserController) UpdateUsers(c echo.Context) error {
-	var payload entity.UpdateUser
+	var payload dto.UpdateUser
 
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
@@ -85,7 +85,7 @@ func (u *UserController) UpdateUsers(c echo.Context) error {
 	}
 	
 	payload.ID = id
-	var user entity.User
+	var user dto.User
 	result := u.Db.First(&user)
 
 	if err := errors.Is(result.Error, gorm.ErrRecordNotFound); err {
