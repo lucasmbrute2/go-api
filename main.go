@@ -52,5 +52,11 @@ func main(){
 	usersGroup.GET("/all", 	userController.FetchUsers)
 	usersGroup.PUT("/:id", 	userController.UpdateUsers)
 
+
+	authGroup := e.Group("/auth")
+
+	authController := controllers.NewAuthController(db)
+	authGroup.POST("/login", authController.Login)
+
 	e.Logger.Fatal(e.Start(":3002"))
 }

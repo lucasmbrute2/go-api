@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -27,6 +28,15 @@ func (u *UserController) CreateUser(c echo.Context) error {
 
 	err := c.Bind(&user); if err != nil {
 		return c.String(http.StatusBadRequest, "bad request")
+	}
+
+	fmt.Println(user.Email)
+	
+	var has dto.User
+	err = u.Db.Where("email = ?", user.Email).First(&has).Error
+
+	if !errors.Is(err, gorm.ErrRecordNotFound){
+		return c.String(http.StatusBadRequest, "email already in use")
 	}
 
 	if err = c.Validate(user); err != nil {
@@ -81,7 +91,6 @@ func (u *UserController) FetchUsers(c echo.Context) error {
 
 	return nil
 } 
-
 
 func (u *UserController) UpdateUsers(c echo.Context) error {
 	var payload dto.UpdateUser
